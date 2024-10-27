@@ -1,86 +1,78 @@
 document.addEventListener("DOMContentLoaded", function () {
     const squares = document.querySelectorAll("#board div");
-    const statusDiv = document.getElementById("status"); // Get the status div
-    const newGameButton = document.getElementById("new-game"); // Get the New Game button
-    let isXTurn = true; // Keeps track of whose turn it is (X or O)
-    let gameState = Array(9).fill(null); // Initialize array with 9 null values
+    const statusDiv = document.getElementById("status");
+    const newGameButton = document.getElementById("new-game");
+    let isXTurn = true; // tracks turns 
+    let gameState = Array(9).fill(null); 
 
-    // Define winning combinations
     const winningCombinations = [
-        [0, 1, 2], // Row 1
-        [3, 4, 5], // Row 2
-        [6, 7, 8], // Row 3
-        [0, 3, 6], // Column 1
-        [1, 4, 7], // Column 2
-        [2, 5, 8], // Column 3
-        [0, 4, 8], // Diagonal 1
-        [2, 4, 6], // Diagonal 2
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+        [0, 4, 8], [2, 4, 6]             // Diagonals
     ];
+    // Check if there is a winner
+    function checkWinner() {
+        for (const combination of winningCombinations) {
+            const [a, b, c] = combination;
+            if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
+                statusDiv.textContent = `Congratulations! ${gameState[a]} is the Winner!`;
+                statusDiv.classList.add("you-won");
+                return true;
+            }
+        }
+        return false;
+    }
+    // Check if there is a draw
+    function checkDraw() {
+        return gameState.every(cell => cell !== null);
+    }
 
-    // Set up each square
+    function resetGame() {
+        gameState.fill(null);
+        squares.forEach(square => {
+            square.textContent = "";
+            square.classList.remove("X", "O");
+        });
+        statusDiv.textContent = "Move your mouse over a square and click to play an X or an O.";
+        statusDiv.classList.remove("you-won");
+        isXTurn = true;
+    }
+
+    // Sets up the squares
     squares.forEach((square, index) => {
         square.classList.add("square");
 
         // Add click event to each square
         square.addEventListener("click", function () {
-            // Only add X or O if square is empty and no player has won yet
-            if (square.textContent === "" && !statusDiv.classList.contains("you-won")) {
+            if (square.textContent === "" && !checkWinner()) { // Only add X or O if square is empty and no winner
                 const playerSymbol = isXTurn ? "X" : "O"; // Determine which player's turn it is
                 square.textContent = playerSymbol; // Update the square's content
                 square.classList.add(playerSymbol); // Add the appropriate class for styling
                 gameState[index] = playerSymbol; // Update the game state array
-
-                // Check for a winner
-                checkWinner(playerSymbol);
-
-                isXTurn = !isXTurn; // Alternate turns
+                if (!checkWinner()) {
+                    if (checkDraw()) {
+                        statusDiv.textContent = "It's a Draw!";
+                    } else {
+                        isXTurn = !isXTurn; // Alternate turns
+                    }
+                }
             }
         });
 
-        // Add mouseenter event to change style on hover
+       
         square.addEventListener("mouseenter", function () {
-            if (square.textContent === "") { // Only change style if square is empty
-                square.classList.add("hover"); // Add hover class
+            if (square.textContent === "") { 
+                square.classList.add("hover"); // Adds hover class
             }
         });
 
-        // Add mouseleave event to revert style when mouse leaves
+       
         square.addEventListener("mouseleave", function () {
-            square.classList.remove("hover"); // Remove hover class
+            square.classList.remove("hover"); // Removes hover class
         });
     });
 
-    // Check for a winner
-    function checkWinner(player) {
-        for (const combination of winningCombinations) {
-            const [a, b, c] = combination;
-            if (gameState[a] === player && gameState[b] === player && gameState[c] === player) {
-                // Update the status message
-                statusDiv.textContent = Congratulations! ${player} is the Winner!;
-                statusDiv.classList.add("you-won"); // Add the you-won class
-                return; // Exit the function once a winner is found
-            }
-        }
-
-        // Check for a draw
-        if (!gameState.includes(null)) {
-            statusDiv.textContent = "It's a Draw!";
-            statusDiv.classList.add("you-won");
-        }
-    }
-
-    // Reset game state and UI
-    function resetGame() {
-        gameState = Array(9).fill(null); // Reset game state
-        squares.forEach(square => {
-            square.textContent = ""; // Clear square content
-            square.classList.remove("X", "O", "hover"); // Remove any classes
-        });
-        statusDiv.textContent = "Player X's Turn"; // Reset status message
-        statusDiv.classList.remove("you-won"); // Remove win class
-        isXTurn = true; // Reset turn to X
-    }
-
-    // Add click event listener to the New Game button
-    newGameButton.addEventListener("click", resetGame); // Handles the new game functionality
+    newGameButton.addEventListener("click", resetGame);
 });
+
+// note that this assignment was done with the help of the following resources: chatgbt,geeks for geeks 
