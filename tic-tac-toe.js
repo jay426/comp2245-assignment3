@@ -1,21 +1,33 @@
 document.addEventListener("DOMContentLoaded", function () {
     const squares = document.querySelectorAll("#board div");
-    let isXTurn = true; // tracks whose turn it is (X or O)  - 1st player is X
-    let gameState = Array(9).fill(null); // Initialize array with 9 null values (empty squares)
+    let isXTurn = true; //tracks the turns(X or O)
+    let gameState = Array(9).fill(null); // set array 
 
-    // Set up each square
+    // adding squares to the board
     squares.forEach((square, index) => {
         square.classList.add("square");
 
-        // Add click event to each square
+       
         square.addEventListener("click", function () {
-            if (square.textContent === "") { // Only add X or O if square is empty
-                const playerSymbol = isXTurn ? "X" : "O"; // Determine which player's turn it is
-                square.textContent = playerSymbol; // Update the square's content
-                square.classList.add(playerSymbol); // Add the appropriate class for styling
-                gameState[index] = playerSymbol; // Update the game state array
-                isXTurn = !isXTurn; // Alternate turns
+            if (square.textContent === "") {
+                const playerSymbol = isXTurn ? "X" : "O"; 
+                square.textContent = playerSymbol; 
+                square.classList.add(playerSymbol); 
+                gameState[index] = playerSymbol; 
+                isXTurn = !isXTurn; 
             }
+        });
+
+        // Add mouseenter event to change style on hover
+        square.addEventListener("mouseenter", function () {
+            if (square.textContent === "") { 
+                square.classList.add("hover"); // Adds hover class
+            }
+        });
+
+        // Add mouseleave event to revert style when mouse leaves
+        square.addEventListener("mouseleave", function () {
+            square.classList.remove("hover"); // Removes hover class
         });
     });
 });
